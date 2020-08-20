@@ -1,1 +1,1 @@
-# NTB-reID
+# Person Re-identification
