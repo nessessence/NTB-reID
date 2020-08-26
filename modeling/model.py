@@ -1,9 +1,9 @@
 import numpy as np
 import torch.nn.functional as F
 from torch import nn
+from torchvision.models import resnet50 
 
 from layers.conv_layer import conv3x3
-
 
 def conv_init(m):
     classname = m.__class__.__name__
@@ -71,3 +71,18 @@ class ResNet18(nn.Module):
         out = self.linear(out)
 
         return out
+
+class StrongBaselineModel(nn.Module):
+    ''' Strong baseline model based on 
+    https://openaccess.thecvf.com/content_CVPRW_2019/papers/TRMTMCT/Luo_Bag_of_Tricks_and_a_Strong_Baseline_for_Deep_Person_CVPRW_2019_paper.pdf
+    '''
+    def __init__(self):
+        super.__init__(self)
+        self.backbone = resnet50(pretrained=True)
+        self.batch_norm = nn.BatchNorm2d(num_features=self._fc.out_features)
+        
+    def forward(self, x):
+        x = self.backbone(x)
+        # global avg pooling (GAP)
+        f_t = x.mean([2, 3])
+        
